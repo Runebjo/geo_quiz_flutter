@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:geo_quiz/model/continents.dart';
 import 'package:geo_quiz/model/countries.dart';
+
+import 'question_screen.dart';
 
 class ContinentsScreen extends StatelessWidget {
   @override
@@ -20,7 +24,11 @@ class ContinentsScreen extends StatelessWidget {
           itemCount: continentList.length,
           itemBuilder: (context, index) {
             return ListTile(
-              onTap: () => createQuestions(continentList[index].continentCode),
+              onTap: () {
+                createQuestions(continentList[index].continentCode);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => QuestionScreen()));
+              },
               title: Text(continentList[index].continentName),
             );
           },
@@ -35,7 +43,15 @@ createQuestions(String continentCode) {
   var questionSet = createQuestionSet(countryDataList);
 }
 
-createQuestionSet(countryDataList) {}
+List<QuestionSet> createQuestionSet(List<CountryData> countryDataList) {
+  List<QuestionSet> questionSetList = new List<QuestionSet>();
+  for (var countryData in countryDataList) {
+    var questionSet = new QuestionSet(countryData);
+    questionSet.generateOptionList(countryDataList);
+    questionSetList.add(questionSet);
+  }
+  return questionSetList;
+}
 
 List<CountryData> getCountriesFromContinent(String continentCode) {
   List<CountryData> countryDataList = new List<CountryData>();
@@ -50,6 +66,34 @@ List<CountryData> getCountriesFromContinent(String continentCode) {
     }
   });
   return countryDataList;
+}
+
+class QuestionSet {
+  final CountryData currentCountry;
+  List<CountryData> optionList = new List<CountryData>();
+
+  QuestionSet(this.currentCountry);
+
+  generateOptionList(List<CountryData> countryDataList) {
+    optionList.add(currentCountry);
+    var indexList = getIndexList(countryDataList);
+    for (var index in indexList) {
+      optionList.add(countryDataList[index]);
+    }
+    optionList.shuffle();
+  }
+
+  List<int> getIndexList(List<CountryData> countryDataList) {
+    var indexList = new List<int>();
+    var random = new Random();
+    while (indexList.length < 3) {
+      var randomNumber = random.nextInt(countryDataList.length);
+      if (!indexList.contains(randomNumber)) {
+        indexList.add(randomNumber);
+      }
+    }
+    return indexList;
+  }
 }
 
 class CountryData {
