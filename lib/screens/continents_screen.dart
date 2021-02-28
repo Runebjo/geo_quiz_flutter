@@ -25,9 +25,13 @@ class ContinentsScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             return ListTile(
               onTap: () {
-                createQuestions(continentList[index].continentCode);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => QuestionScreen()));
+                var questionSet =
+                    createQuestions(continentList[index].continentCode);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            QuestionScreen(questionSet: questionSet)));
               },
               title: Text(continentList[index].continentName),
             );
@@ -38,9 +42,10 @@ class ContinentsScreen extends StatelessWidget {
   }
 }
 
-createQuestions(String continentCode) {
+List<QuestionSet> createQuestions(String continentCode) {
   var countryDataList = getCountriesFromContinent(continentCode);
   var questionSet = createQuestionSet(countryDataList);
+  return questionSet;
 }
 
 List<QuestionSet> createQuestionSet(List<CountryData> countryDataList) {
